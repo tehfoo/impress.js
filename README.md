@@ -5,8 +5,10 @@ This is a fork of [impress.js][1] and [impress.js with substeps][2] that adds ex
 ## How to use
 * Press `ESC` in a presentation as a shortcut to go to the overview. Make sure you have a `step`-element with the id `overview` in your HTML, e.g.
 
+```html
     <div id="overview" class="step" data-x="-2000" data-y="5000" data-scale="15">
     </div>
+```
     
 * In any presentation, you can now also use `backspace` to navigate backwards.
 
