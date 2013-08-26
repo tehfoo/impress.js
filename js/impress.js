@@ -783,7 +783,7 @@
         
         // Prevent default keydown action when one of supported key is pressed.
         document.addEventListener("keydown", function ( event ) {
-            if ( event.keyCode === 9 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
+            if ( event.keyCode === 8 || event.keyCode === 9 || event.keyCode === 27 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
                 event.preventDefault();
             }
         }, false);
@@ -804,8 +804,9 @@
         //   as another way to moving to next step... And yes, I know that for the sake of
         //   consistency I should add [shift+tab] as opposite action...
         document.addEventListener("keyup", function ( event ) {
-            if ( event.keyCode === 9 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
+            if ( event.keyCode === 8 || event.keyCode === 9 || event.keyCode === 27 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
                 switch( event.keyCode ) {
+                    case 8:  // backspace
                     case 33: // pg up
                     case 37: // left
                     case 38: // up
@@ -818,6 +819,11 @@
                     case 40: // down
                              api.next();
                              break;
+                    case 27: // esc
+                             if ( api.goto("overview") ) {
+                                 event.stopImmediatePropagation();
+                                 event.preventDefault();
+                             }                    
                 }
                 
                 event.preventDefault();
