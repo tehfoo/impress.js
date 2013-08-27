@@ -670,6 +670,24 @@
                 return goto(next);
             }
         };
+        
+        var blank = function () {
+            var screen = $("#screen");
+            if ( screen ) {
+                if (screen.style['display'] && screen.style['display'] === 'none') {
+                    css(screen, {
+                        display: "block",
+                        backgroundColor: "black",
+                        width: "100%",
+                        height: "100%",
+                        zIndex: 9999,
+                        position: "absolute"
+                    });
+                } else {
+                    css(screen, {display: 'none'});
+                }
+            }
+        }
 
         
         // Adding some useful classes to step elements.
@@ -743,7 +761,8 @@
             init: init,
             goto: goto,
             next: next,
-            prev: prev
+            prev: prev,
+            blank: blank
         });
 
     };
@@ -789,7 +808,7 @@
         
         // Prevent default keydown action when one of supported key is pressed.
         document.addEventListener("keydown", function ( event ) {
-            if ( event.keyCode === 8 || event.keyCode === 9 || event.keyCode === 27 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
+            if ( event.keyCode === 8 || event.keyCode === 9 || event.keyCode === 27 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) || event.keyCode === 190 ) {
                 event.preventDefault();
             }
         }, false);
@@ -810,7 +829,7 @@
         //   as another way to moving to next step... And yes, I know that for the sake of
         //   consistency I should add [shift+tab] as opposite action...
         document.addEventListener("keyup", function ( event ) {
-            if ( event.keyCode === 8 || event.keyCode === 9 || event.keyCode === 27 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
+            if ( event.keyCode === 8 || event.keyCode === 9 || event.keyCode === 27 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) || event.keyCode === 190 ) {
                 switch( event.keyCode ) {
                     case 8:  // backspace
                     case 33: // pg up
@@ -829,7 +848,10 @@
                              if ( api.goto("overview") ) {
                                  event.stopImmediatePropagation();
                                  event.preventDefault();
-                             }                    
+                             }
+                             break;
+                    case 190: // period.
+                             api.blank();
                 }
                 
                 event.preventDefault();
