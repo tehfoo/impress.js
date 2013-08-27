@@ -205,7 +205,9 @@
     var substepForward = function (element) {
         if (getPresentSubstep(element)) {
             var presentSubstep = getPresentSubstep(element);
-            setSubstepPast(element);
+            presentSubstep.classList.remove("present");
+            presentSubstep.classList.add("past");
+            triggerEvent(presentSubstep, "impress:substep-exit");
         }
         var nextSubstep = getNextSubstep(element);
         nextSubstep.classList.remove("future");
@@ -219,7 +221,6 @@
     var setSubstepPast = function (element) {
         element.classList.remove("present");
         element.classList.add("past");
-        triggerEvent(element, "impress:substep-exit");
     }
 
     // helper for navigation back a substep
