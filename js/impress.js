@@ -205,9 +205,7 @@
     var substepForward = function (element) {
         if (getPresentSubstep(element)) {
             var presentSubstep = getPresentSubstep(element);
-            presentSubstep.classList.remove("present");
-            presentSubstep.classList.add("past");
-            triggerEvent(presentSubstep, "impress:substep-exit");
+            setSubstepPast(element);
         }
         var nextSubstep = getNextSubstep(element);
         nextSubstep.classList.remove("future");
@@ -217,8 +215,12 @@
         triggerEvent(nextSubstep, "impress:substep-active");
         triggerEvent(nextSubstep, "impress:substep-enter");
     }
-
-
+    
+    var setSubstepPast = function (element) {
+        element.classList.remove("present");
+        element.classList.add("past");
+        triggerEvent(element, "impress:substep-exit");
+    }
 
     // helper for navigation back a substep
     var substepBackward = function (element) {
@@ -658,6 +660,9 @@
                 // because substeps cannot be deep linked
                 substepForward(activeStep);
             } else {
+                if (getPresentSubstep(activeStep)) {
+                    setSubstepPast(getPresentSubstep(activeStep));
+                } 
                 // when no future substeps are available goto next step
                 var next = steps.indexOf( activeStep ) + 1;
                 next = next < steps.length ? steps[ next ] : steps[ 0 ];
