@@ -5,6 +5,7 @@ This is a fork of [impress.js][1] and [impress.js with substeps][2] that adds ex
 ## Added functionality
 * Shortcut (`ESC`) to natigate to overview.
 * Navigate backwards with `backspace`.
+* Toggle blank screen with `.`. (This is a standard PowerPoint shortcut and some presentation tools, such as my [Logitech Wireless Presenter][3], have a special key for it.)
 * Last substep gets deactivated when navigating to next step.
 
 ## How to use
@@ -24,3 +25,4 @@ Same as [impress.js][1], this code is released under the MIT and GPL Licenses.
 
 [1]: https://github.com/bartaz/impress.js
 [2]: https://github.com/tehfoo/impress.js
+[3]: http://www.logitech.com/nl-nl/support/175?crid=402
