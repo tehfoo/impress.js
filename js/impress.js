@@ -306,7 +306,8 @@
                 init: empty,
                 goto: empty,
                 prev: empty,
-                next: empty
+                next: empty,
+                blank: empty
             };
         }
         
@@ -515,6 +516,8 @@
                 return false;
             }
             
+            toggleBlank(true);
+            
             // Sometimes it's possible to trigger focus on first link with some keyboard action.
             // Browser in such a case tries to scroll the page to make this element visible
             // (even that body overflow is set to hidden) and it breaks our careful positioning.
@@ -639,7 +642,7 @@
         // `prev` API function goes to previous step (in document order)
         // or backs up one stubstep if a present substep is found
         var prev = function () {
-
+            toggleBlank(true);
             if (getPresentSubstep(activeStep)) {
                 // if this step has a substep in present state
                 // substepBackward. This is not exposed in API
@@ -655,6 +658,7 @@
         
         // `next` API function goes to next step (in document order)
         var next = function () {
+            toggleBlank(true);
             if (getNextSubstep(activeStep)) {
                 // if a future substep is found in this step
                 // substepForward.  This is not exposed in API 
@@ -671,23 +675,37 @@
             }
         };
         
-        var blank = function () {
+        var isBlank = function () {
             var screen = $("#screen");
             if ( screen ) {
                 if (screen.style['display'] && screen.style['display'] === 'none') {
-                    css(screen, {
-                        display: "block",
-                        backgroundColor: "black",
-                        width: "100%",
-                        height: "100%",
-                        zIndex: 9999,
-                        position: "absolute"
-                    });
-                } else {
-                    css(screen, {display: 'none'});
+                    return true;
                 }
             }
+            return false;
         }
+        
+        var toggleBlank = function (forceOff) {
+            var screen = $("#screen");
+            if (isBlank() && !forceOff) {
+                css(screen, {
+                    display: "block",
+                    backgroundColor: "black",
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 9999,
+                    position: "absolute"
+                });
+            } else {
+                css(screen, {display: 'none'});
+            }
+        }
+        
+        var blank = function () {
+            toggleBlank();
+        }
+        
+        
 
         
         // Adding some useful classes to step elements.
