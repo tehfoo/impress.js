@@ -17,6 +17,7 @@ This is a fork of [impress.js][1] and [impress.js with substeps][2] that adds ex
 ```
     
 * In any presentation, you can now also use `backspace` to navigate backwards.
+* In any presentation, press `.` to toggle blank screen.
 
 ## LICENSE
 
