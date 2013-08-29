@@ -338,6 +338,7 @@
         
         // root presentation elements
         var root = byId( rootId );
+        var curtain = document.createElement("div");
         var canvas = document.createElement("div");
         
         var initialized = false;
@@ -447,6 +448,7 @@
             arrayify( root.childNodes ).forEach(function ( el ) {
                 canvas.appendChild( el );
             });
+            body.appendChild(curtain);
             root.appendChild(canvas);
             
             // set initial styles
@@ -471,6 +473,20 @@
                 transform: perspective( config.perspective/windowScale ) + scale( windowScale )
             });
             css(canvas, rootStyles);
+            
+            var curtainStyles = {
+                position: "absolute",
+                transition: "all 0s ease-in-out",
+                transformStyle: "preserve-3d",
+                display: "block",
+                backgroundColor: "black",
+                width: "100%",
+                height: "100%",
+                zIndex: 9999,
+                opacity: 0
+            }
+            
+            css(curtain, curtainStyles);
             
             body.classList.remove("impress-disabled");
             body.classList.add("impress-enabled");
@@ -676,9 +692,8 @@
         };
         
         var isBlank = function () {
-            var screen = $("#screen");
-            if ( screen ) {
-                if (screen.style['display'] && screen.style['display'] === 'none') {
+            if ( curtain ) {
+                if (curtain.style['display'] && curtain.style['display'] === 'none') {
                     return true;
                 }
             }
@@ -686,18 +701,10 @@
         }
         
         var toggleBlank = function (forceOff) {
-            var screen = $("#screen");
             if (isBlank() && !forceOff) {
-                css(screen, {
-                    display: "block",
-                    backgroundColor: "black",
-                    width: "100%",
-                    height: "100%",
-                    zIndex: 9999,
-                    position: "absolute"
-                });
+                css(curtain, {display: 'block', opacity: 1});
             } else {
-                css(screen, {display: 'none'});
+                css(curtain, {display: 'none', opacity: 0});
             }
         }
         
