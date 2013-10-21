@@ -217,8 +217,11 @@
         triggerEvent(nextSubstep, "impress:substep-active");
         triggerEvent(nextSubstep, "impress:substep-enter");
     }
-
-
+    
+    var setSubstepPast = function (element) {
+        element.classList.remove("present");
+        element.classList.add("past");
+    }
 
     // helper for navigation back a substep
     var substepBackward = function (element) {
@@ -303,7 +306,8 @@
                 init: empty,
                 goto: empty,
                 prev: empty,
-                next: empty
+                next: empty,
+                blank: empty
             };
         }
         
@@ -334,6 +338,7 @@
         
         // root presentation elements
         var root = byId( rootId );
+        var curtain = document.createElement("div");
         var canvas = document.createElement("div");
         
         var initialized = false;
@@ -443,6 +448,7 @@
             arrayify( root.childNodes ).forEach(function ( el ) {
                 canvas.appendChild( el );
             });
+            body.appendChild(curtain);
             root.appendChild(canvas);
             
             // set initial styles
@@ -467,6 +473,20 @@
                 transform: perspective( config.perspective/windowScale ) + scale( windowScale )
             });
             css(canvas, rootStyles);
+            
+            var curtainStyles = {
+                position: "absolute",
+                transition: "all 0s ease-in-out",
+                transformStyle: "preserve-3d",
+                display: "block",
+                backgroundColor: "black",
+                width: "100%",
+                height: "100%",
+                zIndex: 999999,
+                opacity: 0
+            }
+            
+            css(curtain, curtainStyles);
             
             body.classList.remove("impress-disabled");
             body.classList.add("impress-enabled");
@@ -511,6 +531,8 @@
                 // presentation not initialized or given element is not a step
                 return false;
             }
+            
+            toggleBlank(true);
             
             // Sometimes it's possible to trigger focus on first link with some keyboard action.
             // Browser in such a case tries to scroll the page to make this element visible
@@ -636,7 +658,7 @@
         // `prev` API function goes to previous step (in document order)
         // or backs up one stubstep if a present substep is found
         var prev = function () {
-
+            toggleBlank(true);
             if (getPresentSubstep(activeStep)) {
                 // if this step has a substep in present state
                 // substepBackward. This is not exposed in API
@@ -652,18 +674,45 @@
         
         // `next` API function goes to next step (in document order)
         var next = function () {
+            toggleBlank(true);
             if (getNextSubstep(activeStep)) {
                 // if a future substep is found in this step
                 // substepForward.  This is not exposed in API 
                 // because substeps cannot be deep linked
                 substepForward(activeStep);
             } else {
+                if (getPresentSubstep(activeStep)) {
+                    setSubstepPast(getPresentSubstep(activeStep));
+                } 
                 // when no future substeps are available goto next step
                 var next = steps.indexOf( activeStep ) + 1;
                 next = next < steps.length ? steps[ next ] : steps[ 0 ];
                 return goto(next);
             }
         };
+        
+        var isBlank = function () {
+            if ( curtain ) {
+                if (curtain.style['display'] && curtain.style['display'] === 'none') {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        var toggleBlank = function (forceOff) {
+            if (isBlank() && !forceOff) {
+                css(curtain, {display: 'block', opacity: 1});
+            } else {
+                css(curtain, {display: 'none', opacity: 0});
+            }
+        }
+        
+        var blank = function () {
+            toggleBlank();
+        }
+        
+        
 
         
         // Adding some useful classes to step elements.
@@ -737,7 +786,8 @@
             init: init,
             goto: goto,
             next: next,
-            prev: prev
+            prev: prev,
+            blank: blank
         });
 
     };
@@ -783,7 +833,7 @@
         
         // Prevent default keydown action when one of supported key is pressed.
         document.addEventListener("keydown", function ( event ) {
-            if ( event.keyCode === 9 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
+            if ( event.keyCode === 8 || event.keyCode === 9 || event.keyCode === 27 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) || event.keyCode === 190 ) {
                 event.preventDefault();
             }
         }, false);
@@ -804,8 +854,9 @@
         //   as another way to moving to next step... And yes, I know that for the sake of
         //   consistency I should add [shift+tab] as opposite action...
         document.addEventListener("keyup", function ( event ) {
-            if ( event.keyCode === 9 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
+            if ( event.keyCode === 8 || event.keyCode === 9 || event.keyCode === 27 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) || event.keyCode === 190 ) {
                 switch( event.keyCode ) {
+                    case 8:  // backspace
                     case 33: // pg up
                     case 37: // left
                     case 38: // up
@@ -818,6 +869,14 @@
                     case 40: // down
                              api.next();
                              break;
+                    case 27: // esc
+                             if ( api.goto("overview") ) {
+                                 event.stopImmediatePropagation();
+                                 event.preventDefault();
+                             }
+                             break;
+                    case 190: // period.
+                             api.blank();
                 }
                 
                 event.preventDefault();
