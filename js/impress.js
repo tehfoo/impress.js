@@ -482,7 +482,7 @@
                 backgroundColor: "black",
                 width: "100%",
                 height: "100%",
-                zIndex: 9999,
+                zIndex: 999999,
                 opacity: 0
             }
             
