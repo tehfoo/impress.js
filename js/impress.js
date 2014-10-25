@@ -5,6 +5,10 @@
  * in modern browsers and inspired by the idea behind prezi.com.
  *
  *
+ * This code is from the substep enabled fork:
+ * https://github.com/tehfoo/impress.js
+ *
+ *
  * Copyright 2011-2012 Bartek Szopka (@bartaz)
  *
  * Released under the MIT and GPL Licenses.
