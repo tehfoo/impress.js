@@ -650,6 +650,27 @@
                 // when no present substep goto previous step
                 var prev = steps.indexOf( activeStep ) - 1;
                 prev = prev >= 0 ? steps[ prev ] : steps[ steps.length-1 ];
+                
+                // but first prep all the substeps, since we're stepping into
+                // the slide's flow from the back
+                var substeps = getSubsteps(prev)
+                if (   typeof substeps != "undefined"
+                    &&        substeps != null
+                    && substeps.length > 0) {
+                    for (var i=0; i < substeps.length; ++i) {
+						substeps[i].classList.add("active");
+						substeps[i].classList.add("past");
+						substeps[i].classList.remove("future");
+						substeps[i].classList.remove("present");
+						
+						// trigger events
+						triggerEvent(substeps[i], "impress:substep-active");
+						triggerEvent(substeps[i], "impress:substep-enter");
+					}
+					substeps[ substeps.length-1 ].classList.remove("past")
+					substeps[ substeps.length-1 ].classList.add("present")
+				}
+                
                 return goto(prev);
             }
         };
@@ -665,7 +686,24 @@
                 // when no future substeps are available goto next step
                 var next = steps.indexOf( activeStep ) + 1;
                 next = next < steps.length ? steps[ next ] : steps[ 0 ];
-                return goto(next);
+                var retVal = goto(next);
+                
+                // once transitioned unstep all the substeps from the last step
+                var substeps = getSubsteps(activeStep);
+                if (   typeof substeps != "undefined"
+                    &&        substeps != null
+                    && substeps.length > 0) {
+                    for (var i=0; i < substeps.length; ++i) {
+                        substeps[i].classList.remove("present");
+                        substeps[i].classList.add("future");
+                        substeps[i].classList.remove("active");
+                        
+                        // trigger events
+                        triggerEvent(substeps[i], "impress:substep-inactive");
+                        triggerEvent(substeps[i], "impress:substep-exit");
+                    }
+                }
+                return retVal;
             }
         };
 
