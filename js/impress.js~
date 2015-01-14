@@ -695,7 +695,7 @@
                     && substeps.length > 0) {
                     for (var i=0; i < substeps.length; ++i) {
                         substeps[i].classList.remove("present");
-                        substeps[i].classList.add("past");
+                        substeps[i].classList.add("future");
                         substeps[i].classList.remove("active");
                         
                         // trigger events
