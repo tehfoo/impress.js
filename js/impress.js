@@ -211,12 +211,14 @@
             var presentSubstep = getPresentSubstep(element);
             presentSubstep.classList.remove("present");
             presentSubstep.classList.add("past");
+            element.classList.remove("impress-substep-" + presentSubstep.id);
             triggerEvent(presentSubstep, "impress:substep-exit");
         }
         var nextSubstep = getNextSubstep(element);
         nextSubstep.classList.remove("future");
         nextSubstep.classList.add("present");
         nextSubstep.classList.add("active");
+        element.classList.add("impress-substep-" + nextSubstep.id);
         // trigger events
         triggerEvent(nextSubstep, "impress:substep-active");
         triggerEvent(nextSubstep, "impress:substep-enter");
@@ -230,6 +232,7 @@
         presentSubstep.classList.remove("present");
         presentSubstep.classList.add("future");
         presentSubstep.classList.remove("active");
+        element.classList.remove("impress-substep-" + presentSubstep.id);
 
          // trigger events
         triggerEvent(presentSubstep, "impress:substep-inactive");
@@ -239,6 +242,7 @@
             var previousSubstep = getPreviousSubstep(element);
             previousSubstep.classList.remove("past");
             previousSubstep.classList.add("present");
+            element.classList.add("impress-substep-" + previousSubstep.id);
             triggerEvent(previousSubstep, "impress:substep-enter");
         }
     };
@@ -410,8 +414,11 @@
             // need to prepare substeps with 'future'
             if (getSubsteps(el).length > 0) {
                 getSubsteps(el).forEach(
-                    function(substep){
+                    function(substep, subId){
                         substep.classList.add("future");
+                        if (!substep.id) {
+                            substep.id = "substep-" + (subId + 1);
+                        }
                     }
                 );
             }
@@ -650,6 +657,32 @@
                 // when no present substep goto previous step
                 var prev = steps.indexOf( activeStep ) - 1;
                 prev = prev >= 0 ? steps[ prev ] : steps[ steps.length-1 ];
+                
+                // but first prep all the substeps, since we're stepping into
+                // the slide's flow from the back
+                var substeps = getSubsteps(prev)
+                if (   typeof substeps != "undefined"
+                    &&        substeps != null
+                    && substeps.length > 0) {
+                    for (var i=0; i < substeps.length; ++i) {
+                        substeps[i].classList.add("active");
+                        substeps[i].classList.add("past");
+                        substeps[i].classList.remove("future");
+                        substeps[i].classList.remove("present");
+                        
+                        prev.classList.remove("impress-substep-"
+                            + substeps[i].id);
+                        
+                        // trigger events
+                        triggerEvent(substeps[i], "impress:substep-active");
+                        triggerEvent(substeps[i], "impress:substep-enter");
+                    }
+                    substeps[ substeps.length-1 ].classList.remove("past");
+                    substeps[ substeps.length-1 ].classList.add("present");
+                    prev.classList.add("impress-substep-"
+                        + substeps[ substeps.length-1 ].id);
+                }
+                
                 return goto(prev);
             }
         };
@@ -665,7 +698,27 @@
                 // when no future substeps are available goto next step
                 var next = steps.indexOf( activeStep ) + 1;
                 next = next < steps.length ? steps[ next ] : steps[ 0 ];
-                return goto(next);
+                var retVal = goto(next);
+                
+                // once transitioned unstep all the substeps from the last step
+                var substeps = getSubsteps(activeStep);
+                if (   typeof substeps != "undefined"
+                    &&        substeps != null
+                    && substeps.length > 0) {
+                    for (var i=0; i < substeps.length; ++i) {
+                        substeps[i].classList.remove("present");
+                        substeps[i].classList.remove("past");
+                        substeps[i].classList.add("future");
+                        substeps[i].classList.remove("active");
+                        next.classList.remove("impress-substep-"
+                            + substeps[i].id);
+                        
+                        // trigger events
+                        triggerEvent(substeps[i], "impress:substep-inactive");
+                        triggerEvent(substeps[i], "impress:substep-exit");
+                    }
+                }
+                return retVal;
             }
         };
 
