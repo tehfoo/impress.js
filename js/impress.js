@@ -707,6 +707,7 @@
                     && substeps.length > 0) {
                     for (var i=0; i < substeps.length; ++i) {
                         substeps[i].classList.remove("present");
+                        substeps[i].classList.remove("past");
                         substeps[i].classList.add("future");
                         substeps[i].classList.remove("active");
                         next.classList.remove("impress-substep-"
