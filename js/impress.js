@@ -665,22 +665,23 @@
                     &&        substeps != null
                     && substeps.length > 0) {
                     for (var i=0; i < substeps.length; ++i) {
-						substeps[i].classList.add("active");
-						substeps[i].classList.add("past");
-						substeps[i].classList.remove("future");
-						substeps[i].classList.remove("present");
-						
-						// trigger events
-						triggerEvent(substeps[i], "impress:substep-active");
-						triggerEvent(substeps[i], "impress:substep-enter");
-					}
-					substeps[ substeps.length-1 ].classList.remove("past")
-					substeps[ substeps.length-1 ].classList.add("present")
-				}
+                        substeps[i].classList.add("active");
+                        substeps[i].classList.add("past");
+                        substeps[i].classList.remove("future");
+                        substeps[i].classList.remove("present");
+                        
                         prev.classList.remove("impress-substep-"
                             + substeps[i].id);
+                        
+                        // trigger events
+                        triggerEvent(substeps[i], "impress:substep-active");
+                        triggerEvent(substeps[i], "impress:substep-enter");
+                    }
+                    substeps[ substeps.length-1 ].classList.remove("past");
+                    substeps[ substeps.length-1 ].classList.add("present");
                     prev.classList.add("impress-substep-"
                         + substeps[ substeps.length-1 ].id);
+                }
                 
                 return goto(prev);
             }
